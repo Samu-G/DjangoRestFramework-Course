@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from news.models import Article
+from rest_framework.relations import HyperlinkedRelatedField
+
+from news.models import Article, Journalist
 from django.utils.timesince import timesince
 from datetime import datetime
 
@@ -12,7 +14,10 @@ class ArticleSerializer(serializers.ModelSerializer):
     time_since_publication = serializers.SerializerMethodField()
     # preleva l'oggetto correlato e serializza il campo con nome e cognome
     # dell'autore correlato in ForegnKey
-    author = serializers.StringRelatedField()
+    # author = serializers.StringRelatedField()
+
+    # Usa il suo specifico serializzatore per inviare l'oggetto dettagliato dell'autore
+    # author = JournalistSerializer()
 
     def get_time_since_publication(self, obj):
         publication_date = obj.publication_date
@@ -35,6 +40,16 @@ class ArticleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Il titolo non può essere più lungo di 90 caratteri")
         return title
     
+class JournalistSerializer(serializers.ModelSerializer):
+    # Usa il suo specifico serializzatore per inviare l'oggetto dettagliato dell'articolo
+    # articles = ArticleSerializer(many=True, read_only=True)
+
+    articles = HyperlinkedRelatedField(many=True, read_only=True, view_name="article detail")
+
+    class Meta:
+        model = Journalist
+        fields = "__all__"
+        # exclude = ("id",)
 
 # class ArticleSerializer(serializers.Serializer):
 #     id = serializers.IntegerField(read_only=True)
