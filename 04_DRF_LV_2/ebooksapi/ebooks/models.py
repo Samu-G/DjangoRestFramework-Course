@@ -19,7 +19,7 @@ class Review(models.Model):
     rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
 
     review = models.TextField(blank=True, null=True)
-    review_author = models.CharField(max_length=8, blank=True, null=True)
+    review_author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     ebook = models.ForeignKey(Ebook, on_delete=models.CASCADE, related_name='reviews')
 
